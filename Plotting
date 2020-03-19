@@ -1,0 +1,68 @@
+import pandas as pd
+from pandas.plotting import scatter_matrix
+import matplotlib.pyplot as plt
+pd.set_option('display.max_columns', None)
+pd.set_option('display.expand_frame_repr', False)
+pd.set_option('max_colwidth', 80)
+pd.set_option('max_rows', 6000)
+df = pd.read_csv("../input/ROSN_200101_200318.csv",sep=';', header=0, index_col='<DATE>', parse_dates=True)
+copy = df.copy()
+df = df.sort_values(by='<DATE>')
+
+print(df);
+df['price change']=(df['<CLOSE>']/df['<CLOSE>'].shift(1))-1
+df['price change'] = ((df['<CLOSE>']/df['<CLOSE>'].shift(1))-1)*100                    
+
+df2 = pd.read_csv("../input/ROSN_200101_200318.csv", sep=';', header=0, index_col='<DATE>',parse_dates = True)
+
+df = df.sort_values(by='<DATE>')
+
+df2['price change']=((df2['<CLOSE>']/df2['<CLOSE>'].shift(1))-4)*100
+df2['price change']=(df2['<CLOSE>']/df2['<CLOSE>'].shift(1))-4
+print(df2)
+
+df['<CLOSE>'].plot(label='rosn')
+df2['<CLOSE>'].plot(label='rostT')
+plt.legend()
+plt.show()
+
+df['<CLOSE>'].plot(label='rosn')
+df2['<CLOSE>'].plot(label='rosT')
+df['quatation1'] = df['<OPEN>'].rolling(60).mean().plot(label='quatation1')
+df2['quatation2'] = df2['<OPEN>'].rolling(60).mean().plot(label='quatation2')
+plt.legend()
+plt.show()
+
+df['turnover'] = df['<OPEN>']*df['<VOL>']
+df2['turnover'] = df2['<OPEN>']*df2['<VOL>']
+df['turnover'].plot(label='rosn',figsize=(16,8))
+df2['turnover'].plot(label='rost',figsize=(16,8))
+plt.legend()
+plt.ylabel('turnaround')
+plt.show()
+
+rosn_corln = pd.concat([df['<OPEN>'],df2['<OPEN>']],axis=1)
+rosn_corln.columns = ['rosn_open','rosn_open']
+print(rosn_corln)
+
+scatter_matrix(rosn_corln,figsize=(8,8),alpha=0.2,hist_kwds={'bins':100});
+plt.show()
+
+
+df['volatility assessment'].plot(label='rosn')
+df2['volatility assessment'].plot(label='rosT')
+plt.legend()
+plt.show()
+df['volatility assessment'].hist(bins=100,label='rosn',alpha=0.7)
+df2['volatility assessment'].hist(bins=100,label='rosT',alpha=0.6)
+plt.legend()
+plt.show()
+df['accumulated stock'] = (1+ df['returns']).cumprod()
+df2['accumulated stock'] = (1+ df2['returns']).cumprod()
+print(df)
+print(df2)
+
+df['accumulated stock'].plot(label='rosn')
+df2['accumulated stock'].plot(label='rosT')
+plt.legend()
+plt.show()
